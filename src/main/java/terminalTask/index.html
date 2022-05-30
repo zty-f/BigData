@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>股票数据交互式可视化</title>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+
+<div>
+    <ul>
+        <li>
+
+        </li>
+    </ul>
+</div>
+
+<button onclick="getStockList()">股票查询</button>
+<button onclick="getStockPrice()">股票价格查询</button>
+<button onclick="getStockData()">股票数据查询</button>
+</body>
+</html>
+
+<script>
+    let stockList = null;
+    $(function (){
+        getStockList();
+    });
+    function getStockList(){
+        $.ajax({
+            url:"http://47.108.14.103:8001/GetStockList",
+            type:"GET",
+            data:{
+              keyword:6006
+            },
+            success:function (data){
+                stockList = data;
+                console.log(data);
+            },
+            error:function (data){
+                console.log(data);
+            }
+        })
+    }
+
+    function getStockPrice(){
+        $.ajax({
+            url:"http://47.108.14.103:8001/GetStockPrice",
+            type:"GET",
+            data:{
+                code:"000002.SZ"
+            },
+            success:function (data){
+                console.log(data);
+            },
+            error:function (data){
+                console.log(data)
+            }
+        })
+    }
+    function getStockData(){
+        $.ajax({
+            url:"http://47.108.14.103:8001/GetStockData",
+            type:"GET",
+            data:{
+                code:"000002.SZ",
+                date:"2022-01-05"
+            },
+            success:function (data){
+                console.log(data);
+            },
+            error:function (data){
+                console.log(data)
+            }
+        })
+    }
+</script>
