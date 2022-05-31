@@ -24,20 +24,26 @@
       </div>
     </el-col>
     <el-col :span="17">
-      <div id="main" style="width: 100%;height: 550px;"></div>
-      <el-col>
-        <el-table :data="everyDayData" style="width: 100%">
-          <el-table-column prop="code" label="股票代码" width="100px"/>
-          <el-table-column prop="open" label="开盘价" />
-          <el-table-column prop="close" label="收盘价" />
-          <el-table-column prop="high" label="最高价" />
-          <el-table-column prop="low" label="最低价" />
-          <el-table-column prop="volume" label="交易量(手)" width="100px"/>
-          <el-table-column prop="money" label="交易量(元)" width="1300px"/>
-          <el-table-column prop="paused" label="是否停牌" />
-          <el-table-column prop="st" label="是否st" />
-        </el-table>
-      </el-col>
+      <el-row>
+        <div id="main" style="width: 100%;height: 550px;"></div>
+      </el-row>
+      <el-row>
+        <el-col :span="24">
+          <div>
+            <el-table :data="everyDayData">
+              <el-table-column prop="code" label="股票代码"/>
+              <el-table-column prop="open" label="开盘价"/>
+              <el-table-column prop="close" label="收盘价"/>
+              <el-table-column prop="high" label="最高价"/>
+              <el-table-column prop="low" label="最低价"/>
+              <el-table-column prop="volume" label="交易量(手)"/>
+              <el-table-column prop="money" label="交易量(元)"/>
+              <el-table-column prop="paused" label="是否停牌"/>
+              <el-table-column prop="st" label="是否st"/>
+            </el-table>
+          </div>
+        </el-col>
+      </el-row>
     </el-col>
   </el-row>
 </template>
@@ -140,7 +146,7 @@ const render = (code: String,name:String) => {
   const option = {
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'cross' }
+      axisPointer: { type: 'cross' },
     },
     toolbox: {
       feature: {
@@ -149,7 +155,7 @@ const render = (code: String,name:String) => {
     },
     title: {
       left:'center',
-      text: name+'每日股票价格数据图表'
+      text: '['+code+']'+name+'每日股票价格数据图表'
     },
     xAxis: {
       name:'日期',
@@ -168,12 +174,21 @@ const render = (code: String,name:String) => {
   }
   // 使用刚指定的配置项和数据显示图表。
   myChart.setOption(option,true);
+
+  //图表设置交互事件前先关闭之前的事件
+  myChart.getZr().off('click');
+
   //设置图表点击交互事件
-  myChart.on("click", function (params) {
+  myChart.getZr().on("click",function (params) {
     console.log("点击图表······");
-    console.log("当前股票代码为："+code);
-    console.log("当前选中日期为"+prices[params.dataIndex].date);
-    getStockData(code,prices[params.dataIndex].date);
+    let pointInPixel= [params.offsetX, params.offsetY];
+    if (myChart.containPixel('grid',pointInPixel)) {
+      let x = myChart.convertFromPixel({seriesIndex: 0}, pointInPixel)[0];
+      console.log("点击处对应x轴坐标为："+x);
+      console.log("点击处对应日期为："+prices[x].date);
+      console.log("当前股票代码为："+code);
+      getStockData(code,prices[x].date);
+    }
   })
   return;
 }
