@@ -30,7 +30,7 @@
       <el-row>
         <el-col :span="24">
           <div>
-            <el-table :data="everyDayData">
+            <el-table :data="everyDayData" v-show="isShowTable">
               <el-table-column prop="code" label="股票代码"/>
               <el-table-column prop="open" label="开盘价"/>
               <el-table-column prop="close" label="收盘价"/>
@@ -54,11 +54,11 @@ import {reactive, ref} from 'vue';
 import axios from "axios";
 import {ElMessage} from 'element-plus';
 import * as echarts from 'echarts';
-import {ECharts} from "echarts";
 
 //声明Echarts
 const input = ref('')
 const keyword=ref("6006");
+const isShowTable=ref(false);
 
 
 const stocks = reactive([{
@@ -124,6 +124,7 @@ const getStockPrice = (code: String,name:String) => {
   axios.get("/GetStockPrice?code="+code).then((response) => {
     const data = response.data;
     if (data.state === "SUC") {
+      isShowTable.value = false;
       prices.length = 0;
       for (let i = 0; i < data.content.length; i++) {
         prices.push(data.content[i]);
@@ -200,6 +201,7 @@ const getStockData = (curCode:String,curDate:String) => {
   axios.get("/GetStockData?code="+curCode+"&date="+curDate).then((response) => {
     const data = response.data;
     if (data.state == "SUC") {
+      isShowTable.value = true;
       everyDayData[0].code = data.content.code;
       everyDayData[0].volume = data.content.volume;
       everyDayData[0].low = data.content.low;
