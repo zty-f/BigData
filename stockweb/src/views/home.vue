@@ -25,10 +25,13 @@
     </el-col>
     <el-col :span="17">
       <el-row>
-        <div id="main" style="width: 100%;height: 510px;"></div>
+        <div id="main" style="width: 100%;height: 490px;"></div>
       </el-row>
       <el-row>
         <el-col :span="24">
+          <el-row v-show="isShowTable">
+            <div id="detail" style="font-weight:bold;color: rgba(234,15,15,0.75);font-family:'微软雅黑';text-align: center;width: 100%"></div>
+          </el-row>
           <div>
             <el-table
               :data="everyDayData"
@@ -104,7 +107,7 @@ const getStockList = () => {
       }
       console.log("查询结果数量"+stocks.length);
       // stocks.push(data.content);
-      ElMessage.success("获取股票列表信息成功！");
+      ElMessage.success("获取以["+keyword.value+"]为首的股票代码对应的股票列表信息成功！");
       console.log(stocks);
     } else {
       ElMessage.error(data.msg);
@@ -143,7 +146,7 @@ const getStockPrice = (code: String,name:String) => {
         prices.push(data.content[i]);
       }
       console.log(prices);
-      ElMessage.success("获取股票价格信息成功！");
+      ElMessage.success("获取["+code+"]股票每日价格信息成功！");
       render(code,name);
     } else {
       ElMessage.error(data.msg);
@@ -170,7 +173,7 @@ const render = (code: String,name:String) => {
     },
     title: {
       left:'center',
-      text: '['+code+']'+name+'每日股票价格数据图表'
+      text: '〖'+code+'〗'+name+'每日股票价格数据图表'
     },
     xAxis: {
       name:'[日期]',
@@ -284,14 +287,14 @@ const render = (code: String,name:String) => {
       console.log("点击处对应x轴坐标为："+x);
       console.log("点击处对应日期为："+prices[x].date);
       console.log("当前股票代码为："+code);
-      getStockData(code,prices[x].date);
+      getStockData(code,prices[x].date,name);
     }
   })
   return;
 }
 
 // 获取选中当天的详细股票信息
-const getStockData = (curCode:String,curDate:String) => {
+const getStockData = (curCode:String,curDate:String,stockName:String) => {
   console.log('获取股票每日详细信息············');
   axios.get("/GetStockData?code="+curCode+"&date="+curDate).then((response) => {
     const data = response.data;
@@ -306,8 +309,10 @@ const getStockData = (curCode:String,curDate:String) => {
       everyDayData[0].money = data.content.money;
       everyDayData[0].paused = data.content.paused;
       everyDayData[0].open = data.content.open;
+      let element = document.getElementById('detail') as HTMLElement;
+      element.innerText = "『"+stockName+"』股票在〔"+curDate+"〕当天的详细信息:";
       console.log(everyDayData);
-      ElMessage.success("获取股票每日详细信息成功！");
+      ElMessage.success("获取["+curCode+"]股票在["+curDate+"]当天的详细信息成功！");
     } else {
       ElMessage.error(data.msg);
     }
